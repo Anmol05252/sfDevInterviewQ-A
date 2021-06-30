@@ -1,4 +1,4 @@
-trigger ContactTriggerAnmol on Contact (after insert,after delete) {
+trigger ContactTrigger on Contact (after insert,after delete) {
     if(Trigger.IsAfter && Trigger.IsInsert){
         ContactTriggerHandler.CountContacts((List<Contact>) Trigger.New);
     }
