@@ -1,0 +1,40 @@
+public with sharing class ContactDetailsController {
+    public String accName{get; set;}
+    public List<Contact> conList{get; set;}
+    public ContactDetailsController(){
+        if(!String.isBlank(accName))
+            conList=[Select Id,firstname,isDeleted,lastname,email from Contact where Account.Name LIKE: accName];
+    }
+    public pageReference showContacts(){
+        if(!String.isBlank(accName))
+            conList=[Select Id,firstname,isDeleted,lastname,email from Contact where Account.Name =: accName];
+        return null;
+    }
+    public pageReference updateRec(){
+        List<Id> delConIdList=new List<Id>();
+        List<Contact> updateConList=new List<Contact>();
+        try{
+            for(Contact cn:conList){
+                if(cn.isDeleted){
+                    delConIdList.add(cn.Id);
+                }
+                else{
+                    updateConList.add(cn);
+                }
+            }
+            if(updateConList.size()>0)
+                Database.SaveResult[] srList=Database.update(updateConList);
+            if(delConIdList.size()>0)
+                Database.DeleteResult[] drList=Database.delete(delConIdList);
+            //System.debug('Updates: '+srList);
+        }
+        catch(Exception e){
+           
+        }
+        return null;
+    }
+    public pageReference delRec(){
+       
+        return null;
+    }
+}
