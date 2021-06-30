@@ -1,0 +1,11 @@
+trigger ContactTrigger2 on Contact (after insert,after update,after delete) {
+    if(Trigger.isAfter && Trigger.IsInsert){
+        ContactTrigger2Handler.MaxMinSalaryOnContact(Trigger.new);
+    }
+    else if(Trigger.isAfter && Trigger.IsUpdate){
+        ContactTrigger2Handler.MaxMinSalaryOnContact(Trigger.new,Trigger.oldMap);
+    }
+    else if(Trigger.isAfter && Trigger.IsDelete){
+        ContactTrigger2Handler.MaxMinSalaryOnContact(Trigger.old);
+    }
+}
