@@ -1,0 +1,71 @@
+public class ContactTrigger2Handler {
+    public static void MaxMinSalaryOnContact(List<Contact> contactList,Map<Id,Contact> oldContactMap){
+        List<Contact> updatedContactList=new List<Contact>();
+        for(Contact con: contactList){
+            if(con.Salary__c!=oldContactMap.get(con.id).Salary__c){
+                updatedContactList.add(con);
+            }
+        }
+        MaxMinSalaryOnContact(updatedContactList);
+    }
+    public static void MaxMinSalaryOnContact(List<Contact> contactList){
+        Set<Id> accountIdSet=new Set<Id>();
+        Map<Id,Double> accountMaxSalaryMap=new Map<Id,Double>();
+        Map<Id,Double> accountMinSalaryMap=new Map<Id,Double>();
+        Double salary;
+        List<Account> updateAccountList=new List<Account>();
+        Set<Account> updateAccountSet=new Set<Account>();
+        //Double maxSalary;
+        //Double minSalary;
+        for(Contact con:contactList){
+            accountIdSet.add(con.AccountId);
+        }
+        for(Contact con: [Select Id,Salary__c,AccountId from Contact where AccountId IN: accountIdSet]){
+            if(accountMaxSalaryMap.containsKey(con.AccountId)
+               &&(accountMaxSalaryMap.get(con.AccountId)<con.Salary__c)){
+                   //salary=accountMaxSalaryMap.get(con.AccountId);
+                   accountMaxSalaryMap.remove(con.AccountId);
+                   accountMaxSalaryMap.put(con.AccountId,con.Salary__c);
+               }
+            else if(accountMinSalaryMap.containsKey(con.AccountId)
+                    &&(accountMinSalaryMap.get(con.AccountId)>con.Salary__c)){
+                        //salary=accountMaxSalaryMap.get(con.AccountId);
+                        accountMinSalaryMap.remove(con.AccountId);
+                        accountMinSalaryMap.put(con.AccountId,con.Salary__c);
+                    }
+            else if(!accountMinSalaryMap.containsKey(con.AccountId) ){
+                accountMinSalaryMap.put(con.AccountId,con.Salary__c);
+                //accountMaxSalaryMap.put(con.AccountId,con.Salary__c);
+            }
+            else if(!accountMaxSalaryMap.containsKey(con.AccountId) ){
+                //accountMinSalaryMap.put(con.AccountId,con.Salary__c);
+                accountMaxSalaryMap.put(con.AccountId,con.Salary__c);
+            }
+        }
+        for(Account acc : [Select Id,MaxSalary__c,MinSalary__c from Account where Id IN: accountIdSet]){
+            if(acc.MaxSalary__c != accountMaxSalaryMap.get(acc.Id) || acc.MinSalary__c != accountMinSalaryMap.get(acc.Id)){
+                if(acc.MaxSalary__c != accountMaxSalaryMap.get(acc.Id) ){
+                    acc.MaxSalary__c=accountMaxSalaryMap.get(acc.Id);
+                   
+                }
+                if(acc.MinSalary__c != accountMinSalaryMap.get(acc.Id)){
+                    acc.MinSalary__c=accountMinSalaryMap.get(acc.Id);
+                    //updateAccountSet.add(acc);
+                }
+               
+                updateAccountSet.add(acc);
+            }
+        }
+       
+        if(updateAccountSet.size()>0){
+            updateAccountList.addAll(updateAccountSet);
+            SavePoint sp= Database.setSavepoint();
+            try{
+                Database.SaveResult[] srList=Database.update(updateAccountList);
+            }
+            catch(DMLException e){
+                Database.rollback(sp);
+            }
+        }
+    }
+}
