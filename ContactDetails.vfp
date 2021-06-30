@@ -1,0 +1,27 @@
+<apex:page controller="ContactDetailsController" lightningStylesheets="true">
+    <apex:form>
+        <apex:outputText value="Enter Account Name: "></apex:outputText>
+        <apex:inputText value="{!accName}" />
+        <apex:commandButton value="Search Contacts" action="{!showContacts}" rerender="out" status="status1"/>
+        <apex:actionStatus id="status1" stopText="Loading Please Wait....">
+            <apex:facet name="stop">
+                <apex:outputPanel id="out">
+                    <apex:pageBlock title="Contact Information" rendered="{!not(isblank(accName))}">
+                        <apex:pageBlockTable value="{!conList}" var="c" align="center" title="Results">
+                            <apex:inlineEditSupport showOnEdit="update,cancelButton" hideOnEdit="editButton" event="ondblclick" changedStyleClass="myBoldClass" resetFunction="resetInlineEdit" />
+                                <apex:column headerValue="FirstName">
+                                    <apex:outputField value="{!c.firstname}"/></apex:column>
+                                <apex:column headerValue="LastName">
+                                    <apex:outputField value="{!c.lastname}"/></apex:column>
+                                <apex:column headerValue="Email">
+                                    <apex:outputField value="{!c.email}"/></apex:column>
+                            <apex:column headerValue="Delete">
+                                <apex:inputCheckbox value="{!c.isDeleted}"/></apex:column>
+                        </apex:pageBlockTable>
+                        <apex:commandButton id="update" action="{!updateRec}" value="Update Records"/>
+                    </apex:pageBlock>
+                </apex:outputPanel>
+            </apex:facet>
+        </apex:actionStatus>
+    </apex:form>
+</apex:page>
