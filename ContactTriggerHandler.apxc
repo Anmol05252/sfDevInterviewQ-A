@@ -1,0 +1,39 @@
+public class ContactTriggerHandler {
+    public static void CountContacts(List<Contact> contactTriggerList){
+        Map<Id,Integer> accountIdConCount=new Map<Id,Integer>();
+        Set<Id> accountIdSet=new Set<Id>();
+        Integer count=0;
+        List<Account> updatedAccountList=new List<Account>();
+        for(Contact con:contactTriggerList){
+            accountIdSet.add(con.AccountId);
+        }
+        for(Contact con:[Select Id,AccountId from Contact where AccountId IN: accountIdSet]){
+            if(accountIdConCount.containsKey(con.AccountId)){
+                count=accountIdConCount.get(con.AccountId);
+                accountIdConCount.remove(con.AccountId);
+                accountIdConCount.put(con.AccountId,count+1);
+            }
+            else{
+                accountIdConCount.put(con.AccountId,1);
+            }
+        }
+        for(Account acc:[Select Id,NumberOfContacts__c from Account where Id IN: accountIdSet]){
+            acc.NumberOfContacts__c=accountIdConCount.get(acc.Id);
+            updatedAccountList.add(acc);
+        }
+        if(updatedAccountList.size()>0){
+            //SavePoint sp =Database.SaveState;
+            try{
+                Database.SaveResult[] srList = Database.update(updatedAccountList);
+            }
+            catch(DMLException e){
+                System.debug('DML Error in Contact Trigger: '+e.getMessage()+' at line '+e.getLineNumber());
+                //sp.rollback
+            }
+            catch(Exception e){
+                System.debug('Error in Contact Trigger: '+e.getMessage()+' at line '+e.getLineNumber());
+               
+            }
+        }
+    }
+}
