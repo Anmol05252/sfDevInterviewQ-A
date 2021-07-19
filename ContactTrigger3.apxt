@@ -1,0 +1,16 @@
+trigger ContactTrigger on Contact (after insert) {
+    //ContactTriggerHandler.run();
+	if(Trigger.isAfter && Trigger.isInsert)
+        ContactTriggerHandler.CopyDescription((List<Contact>)Trigger.new);
+}
+/*
+Trigger 
+new & old
+newMap & OldMap - Map<Id,sObject> xyzMap=Trigger.oldMap;
+for(sobject s: (List<sObject>)Trigger.new)
+{
+    if(s.fieldname != xyzMap.get(s.Id).fieldname)
+        //s				sOld
+        list<sobject> recordstobeprocessed
+}
+IsInsert IsAfte....*/
