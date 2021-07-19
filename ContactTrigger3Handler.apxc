@@ -1,0 +1,28 @@
+public class ContactTrigger3Handler{
+    //ovverride afterInsert(no parameters required){inside .... Trigger Context variables are directly accessible}
+    public static void CopyDescription(List<Contact> contactTriggerList){
+        Set<Id> contactIdSet= new Set<Id>();
+        List<Contact> updateContactList=new List<Contact>();
+        for(Contact con: contactTriggerList){
+            contactIdSet.add(con.Id);
+        }
+        for(Contact con: [Select Id, description, Account.Name from Contact where Id IN: contactIdSet]){
+            con.Description=con.Account.Name;
+            updateContactList.add(con);
+        }
+        //update Operation
+        if(updateContactList.size()>0){
+            SavePoint sp=Database.setSavepoint();
+            try{
+                Database.SaveResult[] srList=Database.update(updateContactList);
+            }
+            catch(dmlexception e){
+                System.debug('Database Error in Contact Trigger Handler::'+e.getMessage()+' at line '+e.getLineNumber());
+                Database.rollback(sp);
+            }
+            catch(Exception e){
+                System.debug('Error in Contact Trigger Handler::'+e.getMessage()+' at line '+e.getLineNumber());
+            }
+        }
+    }
+}
