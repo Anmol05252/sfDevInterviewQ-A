@@ -1,4 +1,4 @@
-trigger ContactTrigger on Contact (after insert) {
+trigger ContactTrigger3 on Contact (after insert) {
     //ContactTriggerHandler.run();
 	if(Trigger.isAfter && Trigger.isInsert)
         ContactTriggerHandler.CopyDescription((List<Contact>)Trigger.new);
