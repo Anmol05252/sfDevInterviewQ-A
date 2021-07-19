@@ -1,7 +1,7 @@
 trigger ContactTrigger3 on Contact (after insert) {
     //ContactTriggerHandler.run();
 	if(Trigger.isAfter && Trigger.isInsert)
-        ContactTriggerHandler.CopyDescription((List<Contact>)Trigger.new);
+        ContactTrigger3Handler.CopyDescription((List<Contact>)Trigger.new);
 }
 /*
 Trigger 
